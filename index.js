@@ -38,10 +38,11 @@ async function run() {
 
     app.get('/products', async (req, res) => {
       const brand = req?.query?.brand;
-      const sort = req?.query?.sort;
+      const sort = req?.query?.sort || "all";
       let limit = req?.query?.limit;
       limit = parseInt(limit)
-      const page = req?.query?.page
+      let page = req?.query?.page;
+      page = parseInt(page)
       const range = req?.query?.range;
       const category = req?.query?.category;
       const search = req?.query?.search;
@@ -89,7 +90,6 @@ async function run() {
       try {
 
         const totalItems = await products.countDocuments(query);
-
 
 
 
