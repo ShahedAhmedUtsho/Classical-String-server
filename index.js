@@ -39,7 +39,9 @@ async function run() {
     app.get('/products', async (req, res) => {
       const brand = req?.query?.brand;
       const sort = req?.query?.sort;
-
+      let limit = req?.query?.limit;
+      limit = parseInt(limit)
+      const page = req?.query?.page
       const range = req?.query?.range;
       const category = req?.query?.category;
       const search = req?.query?.search;
@@ -76,10 +78,33 @@ async function run() {
         query.name = { $regex: search, $options: 'i' };
       }
 
+
+
+
+
+
+
+
+
       try {
-        const result = await products.find(query).sort({ [sort]: order }).toArray();
-        res.send(result);
+
+        const totalItems = await products.countDocuments(query);
+
+
+
+
+
+        const result = await products
+          .find(query)
+          .sort({ [sort]: order })
+          .skip((page - 1) * limit)
+          .limit(limit)
+          .toArray();
+
+
+        res.send({totalItems,products:result});
       } catch (error) {
+        console.log(error)
         res.status(500).send(error);
       }
     });
@@ -93,6 +118,11 @@ async function run() {
 
   }
 }
+
+
+
+
+
 run().catch(console.dir);
 
 
