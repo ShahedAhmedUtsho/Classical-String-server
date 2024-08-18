@@ -8,11 +8,11 @@ const port = process.env.PORT || 3000
 app.use(express.json());
 
 
-
 app.use(cors(
   {
     origin:[
-      "http://localhost:5173"
+      "http://localhost:5173",
+      "https://classical-strings.vercel.app"
     ]
   }
 ));
@@ -30,7 +30,6 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
 
-    await client.connect();
 
     const db = client.db('ClassicalString');
 
@@ -38,11 +37,10 @@ async function run() {
 
     app.get('/products', async (req, res) => {
       const brand = req?.query?.brand;
-      const sort = req?.query?.sort || "all";
-      let limit = req?.query?.limit;
-      limit = parseInt(limit)
-      let page = req?.query?.page;
-      page = parseInt(page)
+      const sort = req?.query?.sort;
+      let page = parseInt(req?.query?.page) || 1;
+      let limit = parseInt(req?.query?.limit) || 6;
+
       const range = req?.query?.range;
       const category = req?.query?.category;
       const search = req?.query?.search;
@@ -104,15 +102,15 @@ async function run() {
 
         res.send({totalItems,products:result});
       } catch (error) {
-        console.log(error)
+
         res.status(500).send(error);
       }
     });
 
 
 
-    await client.db("admin").command({ ping: 1 });
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
+
+
   } finally {
 
 
